@@ -60,7 +60,9 @@ def init_data(path, feature_names, vocs, max_len, model='train',
     assert model in ('train', 'test')
     file_r = codecs.open(path, 'r', encoding='utf-8')
     sentences = file_r.read().strip().split('\n\n')
+
     sentence_count = len(sentences)
+    print "sentence number：", sentence_count
     feature_count = len(feature_names)
     data_dict = dict()
     for feature_name in feature_names:
@@ -74,18 +76,22 @@ def init_data(path, feature_names, vocs, max_len, model='train',
         data_dict['label'] = np.zeros((len(sentences), max_len), dtype='int32')
     for index, sentence in enumerate(sentences):
         items = sentence.split('\n')
+
         one_instance_items = []
         [one_instance_items.append([]) for _ in range(len(feature_names)+1)]
-        for item in items:
 
+        for item in items:
             feature_tokens = item.split(sep)
             for j in range(feature_count):
                 one_instance_items[j].append(feature_tokens[j])
             if model == 'train':
                 one_instance_items[-1].append(feature_tokens[-1])
         for i in range(len(feature_names)):
+            # print data_dict[feature_names[i]][index]
             data_dict[feature_names[i]][index, :] = map_item2id(
                 one_instance_items[i], vocs[i], max_len)
+            # print data_dict[feature_names[i]][index]
+
         if use_char_feature:
             for i, word in enumerate(one_instance_items[0]):
                 if i >= max_len:
