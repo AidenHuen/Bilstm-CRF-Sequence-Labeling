@@ -1,0 +1,9 @@
+苏	NR
+州	NR
+大	NN
+学	NN
+
+广	NR
+州	NR
+大	NN
+学	NN
