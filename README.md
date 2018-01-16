@@ -1,10 +1,9 @@
 
 
 # NER-LSTM-CRF
-An easy-to-use named entity recognition (NER) toolkit, implemented the LSTM+\[CNN\]+CRF model in tensorflow.
-
-## the source project is from https://github.com/liu-nlper/NER-LSTM-CRF
-## 与源项目相比，动了config.yml和添加了新的训练集和word2vec词向量，用以进行中文词性标注和分词
+An easy-to-use named entity recognition (NER) toolkit, implemented the LSTM+\[CNN\]+CRF model in tensorflow. <br>
+the source project is from https://github.com/liu-nlper/NER-LSTM-CRF<br>
+与源项目相比，改动了config.yml和替换了新的训练集和word2vec词向量，用以进行中文词性标注和分词<br>
 
 ## 1. Model
 Bi-LSTM/Bi-GRU + \[CNN\] + CRF，其中CNN层针对英文，捕获字符层面特征，通过参数`use_char_feature`控制self.nil_vars.add(self.feature_weight_dict[feature_name].name)。
