@@ -10,7 +10,7 @@ An easy-to-use sequence labeling toolkit, implemented the LSTM+\[CNN\]+CRF model
 训练集为`data/nlpcc_train.txt`<br>
 测试集为`data/nlpcc_test.txt`<br>
 embedding集为`data/nlpcc_embedding.txt`<br>
-输出文件为`data/result.txt`<br>
+输出文件为`data/result.result`<br>
 配置文件为`config.yml`<br>
 
 ### 1.1 预处理
