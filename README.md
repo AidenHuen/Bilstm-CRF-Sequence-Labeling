@@ -5,9 +5,12 @@ An easy-to-use sequence labeling toolkit, implemented the LSTM+\[CNN\]+CRF model
 
 ## statement
 
-与源项目相比，改动了config.yml和替换了新的训练集和char embedding集，用以进行中文词性标注和分词<br>
+与源项目相比，改动了config.yml和替换了新的数据集和char embedding集，用以进行中文词性标注和分词<br>
 
-
+训练集为`data/nlpcc_train.txt`<br>
+测试集为`data/nlpcc_test.txt`<br>
+embedding集为`data/nlpcc_embedding.txt`<br>
+输出文件为`data/result.txt`<br>
 
 ### 1.1 预处理
     $ python/python3 preprocessing.py
