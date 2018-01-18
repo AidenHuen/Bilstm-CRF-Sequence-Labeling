@@ -3,7 +3,7 @@
 # Bilstm-CRF-Sequence-Labeling
 An easy-to-use sequence labeling toolkit, implemented the LSTM+\[CNN\]+CRF model in tensorflow. the source repo is from https://github.com/liu-nlper/NER-LSTM-CRF . you can directly use the model in this repo or use your own train set to train a new model.<br>
 
-##Statement
+## Statement
 repo中的已有的模型基于nlpcc2015中文POS集进行训练,可直接用于中文词性标注和分词,运行`test.py`输出标注结果.通过配置`config.yml`，实现模型训练和测试,下面详细介绍模型训练过程<br>
 
 ### 1.1 预处理
