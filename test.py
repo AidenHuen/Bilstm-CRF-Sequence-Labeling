@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 __author__ = 'jxliu.nlper@gmail.com'
+_author = "Aiden Huen"
+
 """
     标记文件
 """
@@ -10,9 +12,9 @@ import pickle
 import tensorflow as tf
 from load_data import load_vocs, init_data
 from model import SequenceLabelingModel
+import os
 
-
-def main():
+def tagging():
     # 加载配置文件
     with open('./config.yml') as file_config:
         config = yaml.load(file_config)
@@ -113,6 +115,54 @@ def main():
 
     file_result.close()
 
+def create_testset(testset_answer_path,testset_path):
+    """
+    生成待标注测试集文件
+    :param testset_answer_path: 已标注测试集路径
+    :param testset_path:    待标注测试集路径
+    """
+    f = codecs.open(testset_answer_path, encoding="utf-8")
+    rows = f.readlines()
+    f.close()
+
+
+    if not os.path.isfile(testset_path):
+        os.mknod(testset_path)
+        f = codecs.open(testset_path,"w", encoding="utf-8")
+        for row in rows:
+            row = row.replace("\n", "")
+            char = row.split("	")[0]
+            f.write(char+u"\n")
+            f.close()
+        print "create_testset ok"
+
+
+def get_precision():
+    """
+    精度计算
+    """
+    with open('./config.yml') as file_config:
+        config = yaml.load(file_config)
+    f_answer = codecs.open(config["data_params"]["path_answer"], encoding="utf-8")
+    f_result = codecs.open(config["data_params"]["path_result"], encoding="utf-8")
+    data = f_answer.read()
+    rows_answer = data.split("\n")
+    data = f_result.read()
+    rows_result = data.split("\n")
+    test_num = 0
+    correct_num = 0
+    for i in range(rows_answer.__len__()):
+        answer_items = rows_answer[i].split("	")
+        result_items = rows_result[i].split("	")
+        if answer_items.__len__()==2 and result_items.__len__()==2:
+            test_num += 1
+            print answer_items[0], "pred_val:", result_items[1], "true_val:", answer_items[1]
+            if answer_items[1]==result_items[1]:
+                correct_num += 1
+
+    print "precision:", correct_num*1.0/test_num
+    f_answer.close()
 
 if __name__ == '__main__':
-    main()
+    tagging()  # 标记测试集
+    get_precision()

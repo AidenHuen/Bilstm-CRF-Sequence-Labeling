@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 __author__ = 'jxliu.nlper@gmail.com'
 """
-    训练NER模型
+    训练序列标注模型
 """
 import yaml
 import pickle

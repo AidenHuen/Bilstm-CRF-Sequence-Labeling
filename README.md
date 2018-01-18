@@ -1,17 +1,10 @@
 
 
 # Bilstm-CRF-Sequence-Labeling
-An easy-to-use sequence labeling toolkit, implemented the LSTM+\[CNN\]+CRF model in tensorflow. the source repo is from https://github.com/liu-nlper/NER-LSTM-CRF<br>
+An easy-to-use sequence labeling toolkit, implemented the LSTM+\[CNN\]+CRF model in tensorflow. the source repo is from https://github.com/liu-nlper/NER-LSTM-CRF . you can directly use the model in this repo or use your own train set to train a new model.<br>
 
-## statement
-
-与源项目相比，改动了config.yml和替换了新的数据集和char embedding集，用以进行中文词性标注和分词<br>
-
-训练集为`data/nlpcc_train.txt`<br>
-测试集为`data/nlpcc_test.txt`<br>
-embedding集为`data/nlpcc_embedding.txt`<br>
-输出文件为`data/result.result`<br>
-配置文件为`config.yml`<br>
+##Statement
+repo中的已有的模型基于nlpcc2015中文POS集进行训练,可直接用于中文词性标注和分词,运行`test.py`输出标注结果.通过配置`config.yml`，实现模型训练和测试,下面详细介绍模型训练过程<br>
 
 ### 1.1 预处理
     $ python/python3 preprocessing.py
@@ -27,8 +20,8 @@ embedding集为`data/nlpcc_embedding.txt`<br>
 
     $ python/python3 train.py
 
-### 1.3 标记数据
-标记数据：`config.yml`中修改相应的`path_test`和`path_result`，并运行：
+### 1.3 测试模型
+测试模型：`config.yml`中修改相应的`path_test`和`path_result`和`path_answer`，并运行：
 
     $ python/python3 test.py
 
@@ -61,6 +54,14 @@ embedding集为`data/nlpcc_embedding.txt`<br>
 |23|conv_filter_len_list|list，当使用`char feature`时，卷积核的尺寸，用户设定，默认值`[1, 2, 3, 4, 5]`|
 |24|conv_dropout|卷积层的dropout rate|
 |25|Other parameters|......|
+
+### 针对nlpcc2015词性标注任务
+训练集为`data/nlpcc_dataset/train.txt`<br>
+测试集为`data/nlpcc_dataset/testset.txt`<br>
+embedding集存于`data/envedding/.txt`<br>
+测试集标注结果存至`data/nlpcc_dataset/test_result.result`<br>
+测试集答案为`data/nlpcc_dataset/testset_answer.txt`<br>
+运行 'test.py' 对测试集进行标注，并计算准确率
 
 ## 2. Requirements
 - numpy

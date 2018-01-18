@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/BiLstm-CRF-Sequence-Labeling.iml" filepath="$PROJECT_DIR$/.idea/BiLstm-CRF-Sequence-Labeling.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Bilstm-CRF-Sequence-Labeling.iml" filepath="$PROJECT_DIR$/.idea/Bilstm-CRF-Sequence-Labeling.iml" />
     </modules>
   </component>
 </project>

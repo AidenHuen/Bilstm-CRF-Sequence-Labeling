@@ -1,5 +1,6 @@
 data_params:
   path_result: ./data/nlpcc_dataset/test_result.result
+  path_answer: ./data/nlpcc_dataset/testset_answer.txt
   path_test: ./data/nlpcc_dataset/testset.txt
   path_train: ./data/nlpcc_dataset/trainset.txt
   sep: table
@@ -27,7 +28,7 @@ model_params:
     f1:
       dropout_rate: 0.3
       path: ./Res/embed/char_embed.pkl
-      path_pre_train: ./data/nlpcc_dataset/nlpcc_embedding.txt
+      path_pre_train: ./data/embedding/nlpcc_embedding_100.txt
       shape: [3839, 100]
     f2:
       dropout_rate: 0.3
