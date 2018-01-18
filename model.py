@@ -473,12 +473,13 @@ class SequenceLabelingModel(object):
         """
         根据训练好的模型标记数据
         Args:
-            data_test_dict: dict
+            data_test_dict: dict 包含测试集中各特证的数据集，特证数据集为二维数组
         Return:
             pass
         """
         print('predicting...')
-        data_count = data_test_dict[self._feature_names[0]].shape[0]
+        data_count = data_test_dict[self._feature_names[0]].shape[0]  # 测试集序列（句子）数
+
         nb_test = int(math.ceil(data_count / float(self._batch_size)))
         viterbi_sequences = []  # 标记结果
         for i in tqdm(range(nb_test)):

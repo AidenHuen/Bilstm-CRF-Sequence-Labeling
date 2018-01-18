@@ -57,13 +57,15 @@ def init_data(path, feature_names, vocs, max_len, model='train',
     Returns:
         data_dict: dict
     """
-    assert model in ('train', 'test')
+    assert model in ('train', 'test')  # 限定数据集类型，训练集或测试集
     file_r = codecs.open(path, 'r', encoding='utf-8')
-    sentences = file_r.read().strip().split('\n\n')
+    sentences = file_r.read().strip().split('\n\n')  # 将训练集切为以句子为单位的列表
 
-    sentence_count = len(sentences)
+    sentence_count = len(sentences)  # 句子数
     print "sentence number：", sentence_count
     feature_count = len(feature_names)
+
+    # 初始化数据集，data_dict存放不同feature和trainset标签的矩阵
     data_dict = dict()
     for feature_name in feature_names:
         data_dict[feature_name] = np.zeros((sentence_count, max_len), dtype='int32')
@@ -72,25 +74,26 @@ def init_data(path, feature_names, vocs, max_len, model='train',
         data_dict['char'] = np.zeros(
             (sentence_count, max_len, word_len), dtype='int32')
         char_voc = vocs.pop(0)
-    if model == 'train':
+    if model == 'train':  # 训练集包含标签
         data_dict['label'] = np.zeros((len(sentences), max_len), dtype='int32')
     for index, sentence in enumerate(sentences):
-        items = sentence.split('\n')
-
-        one_instance_items = []
+        items = sentence.split('\n') # 取句子的元素（特征，标签）
+        one_instance_items = [] # 用以分开存放一个句子的特征向量（list），和标签向量（list）
         [one_instance_items.append([]) for _ in range(len(feature_names)+1)]
 
         for item in items:
-            feature_tokens = item.split(sep)
+            feature_tokens = item.split(sep)  # 根据数据集中间隔符，将特征和标签分开
             for j in range(feature_count):
                 one_instance_items[j].append(feature_tokens[j])
             if model == 'train':
                 one_instance_items[-1].append(feature_tokens[-1])
         for i in range(len(feature_names)):
             # print data_dict[feature_names[i]][index]
+            # 将数据集中各特证和标签，转化为int型id
             data_dict[feature_names[i]][index, :] = map_item2id(
                 one_instance_items[i], vocs[i], max_len)
             # print data_dict[feature_names[i]][index]
+
 
         if use_char_feature:
             for i, word in enumerate(one_instance_items[0]):
@@ -98,6 +101,7 @@ def init_data(path, feature_names, vocs, max_len, model='train',
                     break
                 data_dict['char'][index][i, :] = map_item2id(
                     word, char_voc, word_len)
+
         if model == 'train':
             data_dict['label'][index, :] = map_item2id(
                 one_instance_items[-1], vocs[-1], max_len)

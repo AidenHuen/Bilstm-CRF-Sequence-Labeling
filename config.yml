@@ -1,7 +1,7 @@
 data_params:
-  path_result: ./data/result.result
-  path_test: ./data/nlpcc_test.txt
-  path_train: ./data/nlpcc_train.txt
+  path_result: ./data/nlpcc_dataset/test_result.result
+  path_test: ./data/nlpcc_dataset/testset.txt
+  path_train: ./data/nlpcc_dataset/trainset.txt
   sep: table
   voc_params:
     char: {min_count: 0, path: ./Res/voc/char.voc.pkl}
@@ -23,12 +23,12 @@ model_params:
       dropout_rate: 0.3
       path: null
       path_pre_train: null
-      shape: [85, 16]
+      shape: [3835, 16]
     f1:
       dropout_rate: 0.3
       path: ./Res/embed/char_embed.pkl
-      path_pre_train: ./data/nlpcc_embedding.txt
-      shape: [3969, 100]
+      path_pre_train: ./data/nlpcc_dataset/nlpcc_embedding.txt
+      shape: [3839, 100]
     f2:
       dropout_rate: 0.3
       path: null
@@ -38,13 +38,13 @@ model_params:
   l2_rate: 0.001
   learning_rate: 0.002
   max_patience: 5
-  nb_classes: 124
+  nb_classes: 123
   nb_epoch: 200
-  path_model: ./Model/best_model
+  path_model: ./Model/nlpcc-emb50-bilstm-crf/best_model
   rnn_unit: lstm
   sequence_len_pt: 98
   sequence_length: 84
   use_char_feature: false
   use_crf: true
   word_len_pt: 95
-  word_length: 11
+  word_length: 1
