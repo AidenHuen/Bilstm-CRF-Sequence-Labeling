@@ -11,6 +11,11 @@ reload(sys)
 class text_class(object):
 
     def __init__(self, input_path,output_path):
+        """
+        构造函数
+        :param input_path: 输入原始文件路径
+        :param output_path: 输出训练文件路径
+        """
         self.input = input_path
         self.out_put = output_path
 

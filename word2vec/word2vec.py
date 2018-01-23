@@ -1,12 +1,10 @@
 # coding:utf-8
 from get_text import text_class
 import sys
-
-reload(sys)
-sys.setdefaultencoding("utf-8")
 from gensim.models import word2vec
 from gensim.models import Word2Vec
-import logging, gensim, os
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 """
 word2vec
