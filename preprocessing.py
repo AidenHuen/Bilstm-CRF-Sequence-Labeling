@@ -161,7 +161,7 @@ def main():
 
     # 构建embedding表
     feature_dim_dict = dict()  # 存储每个feature的dim
-    for i, feature_name in enumerate(feature_names):
+    for i, feature_name in enumerate(feature_names):  # i:0,feature_name:f1
         path_pre_train = config['model_params']['embed_params'][feature_name]['path_pre_train']
         if not path_pre_train:
             if i == 0:
@@ -174,6 +174,7 @@ def main():
         with open(path_voc, 'rb') as file_r:
             voc = pickle.load(file_r)
         embedding_dict, vec_dim = load_embed_from_txt(path_pre_train)
+        print feature_name, "dim_num:", vec_dim
         feature_dim_dict[feature_name] = vec_dim
         embedding_matrix = np.zeros((len(voc.keys())+2, vec_dim), dtype='float32')
         for item in voc:

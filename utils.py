@@ -191,8 +191,9 @@ def load_embed_from_txt(path):
         embed_dict: dict
     """
     file_r = codecs.open(path, 'r', encoding='utf-8')
+    # line:文件第一行
     line = file_r.readline()
-
+    # voc_size：字典规模，vec_dim：向量维度
     voc_size, vec_dim = map(int, line.split(' '))
 
     embedding = dict()

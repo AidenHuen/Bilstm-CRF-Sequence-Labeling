@@ -416,7 +416,7 @@ class SequenceLabelingModel(object):
 
     def split_train_dev(self, data_dict, dev_size=0.2):
         """
-        划分为开发集和测试集
+        划分为开发集和训练集
         Args:
             data_dict: dict, 键: 特征名(or 'label'), 值: np.array
             dev_size: float, 开发集所占的比例，default is 0.2
