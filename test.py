@@ -13,6 +13,15 @@ import tensorflow as tf
 from load_data import load_vocs, init_data
 from model import SequenceLabelingModel
 import os
+from tqdm import tqdm
+
+import codecs
+import yaml
+import pickle
+import tensorflow as tf
+from load_data import load_vocs, init_data
+from model import SequenceLabelingModel
+import os
 
 def tagging():
     # 加载配置文件
@@ -115,54 +124,218 @@ def tagging():
 
     file_result.close()
 
-def create_testset(testset_answer_path,testset_path):
+def create_testset():
     """
     生成待标注测试集文件
     :param testset_answer_path: 已标注测试集路径
     :param testset_path:    待标注测试集路径
     """
-    f = codecs.open(testset_answer_path, encoding="utf-8")
+    with open('./config.yml') as file_config:
+        config = yaml.load(file_config)
+
+    f = codecs.open(config["data_params"]["path_answer"], encoding="utf-8")
     rows = f.readlines()
     f.close()
 
 
-    if not os.path.isfile(testset_path):
-        os.mknod(testset_path)
-        f = codecs.open(testset_path,"w", encoding="utf-8")
-        for row in rows:
-            row = row.replace("\n", "")
-            char = row.split("	")[0]
-            f.write(char+u"\n")
-            f.close()
-        print "create_testset ok"
+    if not os.path.isfile(config["data_params"]["path_test"]):
+        os.mknod(config["data_params"]["path_test"])
 
+    f = codecs.open(config["data_params"]["path_test"], "w", encoding="utf-8")
+    for row in rows:
+        row = row.replace("\n", "")
+        # print row
+        items = row.split("\t")
+        # print items
+
+        if len(items) == 1:
+            f.write(items[0] + u"\n")
+        else:
+
+            row = "\t".join(items[0:len(items)-1])
+            f.write(row+u"\n")
+    f.close()
+    print "create_testset ok"
+
+import DataProcess
+
+def get_precison_unregister_name():
+    """
+      人名未登录词识别效果计算
+      """
+    names = DataProcess.get_register_name()
+    with open('./config.yml') as file_config:
+        config = yaml.load(file_config)
+    f_answer = codecs.open(config["data_params"]["path_answer"], encoding="utf-8")
+    f_result = codecs.open(config["data_params"]["path_result"], encoding="utf-8")
+    data = f_answer.read()
+    f_answer.close()
+    rows_answer = data.split("\n")
+    items_answer = [[i.split("	")[0], i.split("	")[len(i.split("	")) - 1]] for i in rows_answer]
+    data = f_result.read()
+    f_result.close()
+    rows_result = data.split("\n")
+    items_result = [[i.split("	")[0], i.split("	")[len(i.split("	")) - 1]] for i in rows_result]
+    precision_num = 0.0
+    recall_num = 0.0
+    correct_num = 0.0
+    name = ""
+    i=0
+    while(i<items_result.__len__()):
+        try:
+            if items_result[i][1][0] == "B":
+                j = i + 1
+                name += items_result[i][0]
+                while (j < items_result.__len__()):
+                    if items_result[j][1][0] != "E" and items_result[j][1] != "W":
+                        name += items_result[j][0]
+                        j += 1
+                        continue
+                    elif items_result[j][1][0] == "E":
+                        name += items_result[j][0]
+                        try:
+                            names[name] += 1
+                            i = j+ 1
+                            name = ""
+                            break
+                        except:
+                            # print name
+                            precision_num += 1
+                            i = j+1
+                            name = ""
+                            break
+                    else:
+                        if name.__len__() >1:
+                            try:
+                                # print name
+                                names[name] += 1
+                                i = j+ 1
+                                name = ""
+                                break
+                            except:
+                                # print name
+                                precision_num += 1
+                                i = j+1
+                                name = ""
+                                break
+                        else:
+                            i = j + 1
+                            name = ""
+                            break
+
+        except:
+            pass
+        i += 1
+    print precision_num
+    i = 0
+    while i < items_answer.__len__():
+        if items_result[i][1] != "" and items_answer[i][1] != "":
+            if items_result[i][1][0] == "B" and items_result[i][1][0] == items_answer[i][1][0]:  # 匹配人名首字
+                name = ""
+                j = i
+                while j < items_answer.__len__():
+                    if items_answer[j][1][0] != "E" and items_answer[j][1] != "W":
+
+                        j += 1
+                    else:
+                        break
+                if items_result[j][1][0] == "E":  # 匹配人名尾字
+                    name = ""
+                    for z in range(i,j+1):
+                        name += items_result[z][0]
+                    try:
+                        print name
+                        names[name] += 1
+                    except:
+                        print name
+                        correct_num += 1
+                    name = ""
+
+                    i = j+1
+
+        i += 1
+    recall_num = 191.0
+    print precision_num, recall_num
+
+    p = correct_num / precision_num
+    r = correct_num / recall_num
+
+    print("all")
+    print ("p:")
+    print(p)
+    print ("r:")
+    print (r)
+    print ("f:")
+    print(2 * p * r / (p + r))
 
 def get_precision():
     """
-    精度计算
+    精度计算，基于人名
     """
     with open('./config.yml') as file_config:
         config = yaml.load(file_config)
     f_answer = codecs.open(config["data_params"]["path_answer"], encoding="utf-8")
     f_result = codecs.open(config["data_params"]["path_result"], encoding="utf-8")
     data = f_answer.read()
-    rows_answer = data.split("\n")
-    data = f_result.read()
-    rows_result = data.split("\n")
-    test_num = 0
-    correct_num = 0
-    for i in range(rows_answer.__len__()):
-        answer_items = rows_answer[i].split("	")
-        result_items = rows_result[i].split("	")
-        if answer_items.__len__()==2 and result_items.__len__()==2:
-            test_num += 1
-            print answer_items[0], "pred_val:", result_items[1], "true_val:", answer_items[1]
-            if answer_items[1]==result_items[1]:
-                correct_num += 1
-
-    print "precision:", correct_num*1.0/test_num
     f_answer.close()
+    rows_answer = data.split("\n")
+    items_answer = [[i.split("	")[0], i.split("	")[len(i.split("	"))-1]] for i in rows_answer]
+    data = f_result.read()
+    f_result.close()
+    rows_result = data.split("\n")
+    items_result = [[i.split("	")[0], i.split("	")[len(i.split("	")) - 1]] for i in rows_result]
+    precision_num = 0.0
+    recall_num = 0.0
+    correct_num = 0.0
 
+    for items in items_result:
+        # print items
+        try:
+            if items[1][0] == "B":
+                precision_num += 1
+        except:
+            pass
+    for items in items_answer:
+        # print items
+        try:
+            if items[1][0] == "B":
+                recall_num += 1
+        except:
+            pass
+    i = 0
+    while i < items_answer.__len__():
+        if items_result[i][1]!="" and items_answer[i][1]!="":
+            if items_result[i][1][0] == "B" and items_result[i][1][0] == items_answer[i][1][0]:  # 匹配人名首字
+                j = i
+                while j<items_answer.__len__():
+                    print items_answer[j][0], items_answer[j][1]
+                    if items_answer[j][1][0] != "E":
+                        j+=1
+                    else:
+                        break
+                if items_result[j][1][0] == "E":   # 匹配人名尾字
+                    # print items_answer[j][1], items_result[j][1]
+                    correct_num += 1
+                    i = j
+        i += 1
+
+    p = correct_num/precision_num
+    r = correct_num/recall_num
+
+    print("all")
+    print ("p:")
+    print(p)
+    print ("r:")
+    print (r)
+    print ("f:")
+    print(2*p*r/(p+r))
+
+import test2,test3,test4
 if __name__ == '__main__':
-    tagging()  # 标记测试集
-    get_precision()
+    # create_testset()
+    # tagging()  # 标记测试集
+    # get_precision()
+    # test2.get_precision()
+    # test3.get_precision()
+    # test4.get_precision()
+    get_precison_unregister_name()

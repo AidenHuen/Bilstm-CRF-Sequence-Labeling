@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
+import codecs
+
+from load_data import init_data, load_vocs
+
 __author__ = 'jxliu.nlper@gmail.com'
 """
     模型: bi-lstm + crf
 """
+
 import math
 import numpy as np
 from tqdm import tqdm
@@ -11,6 +16,10 @@ import tensorflow as tf
 from tensorflow.contrib import rnn
 from utils import uniform_tensor, get_sequence_actual_length, \
     zero_nil_slot, shuffle_matrix
+import random
+import yaml
+import os
+import pickle
 
 def get_activation(activation=None):
     """
@@ -130,7 +139,7 @@ class SequenceLabelingModel(object):
           rnn_unit: str, lstm or gru
           learning_rate: float, default is 0.001
           clip: None or float, gradients clip
-          
+
           use_char_feature: bool,是否使用字符特征
           word_length: int, 单词长度
         """
@@ -207,7 +216,7 @@ class SequenceLabelingModel(object):
                     initial_value=self._feature_init_weight_dict[feature_name],
                     name='feature_weight_%s' % feature_name)
                 self.nil_vars.add(self.feature_weight_dict[feature_name].name)
-
+                # print "self.feature_weight_dict[feature_name].name:",self.feature_weight_dict[feature_name].name
             # init dropout rate, 初始化未指定的
             if feature_name not in self._feature_weight_dropout_dict:
                 self._feature_weight_dropout_dict[feature_name] = 0.
@@ -251,7 +260,9 @@ class SequenceLabelingModel(object):
         input_features = self.embedding_features[0] if len(self.embedding_features) == 1 \
             else tf.concat(values=self.embedding_features, axis=2, name='input_features')
         if self._use_char_feature:
-            input_features = tf.concat([input_features, couv_feature_char], axis=-1)
+            input_features = tf.concat([input_features, couv_feature_char], axis1=-1)
+
+
 
         # multi bi-lstm layer
         _fw_cells = []
@@ -313,8 +324,9 @@ class SequenceLabelingModel(object):
         # TODO sess, visible_device_list待修改
         gpu_options = tf.GPUOptions(visible_device_list='0', allow_growth=True)
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
-
-        # init all variable
+        # data = self.sess.run(input_features)
+        # for i in data:
+        #     print i
         init = tf.global_variables_initializer()
         self.sess.run(init)
 
@@ -335,13 +347,14 @@ class SequenceLabelingModel(object):
         Args:
             data_dict: dict, 键: 特征名(or 'label'), 值: np.array
             dev_size: float, 开发集所占的比例，default is 0.2
-
             batch_size: int
             seed: int, for shuffle data
         """
+
         data_train_dict, data_dev_dict = self.split_train_dev(data_dict, dev_size=dev_size)
         self.saver = tf.train.Saver()  # save model
         train_data_count = data_train_dict['label'].shape[0]
+        # print "train_data_count:", train_data_count
         nb_train = int(math.ceil(train_data_count / float(self._batch_size)))
         min_dev_loss = 1000  # 全局最小dev loss, for early stopping)
         current_patience = 0  # for early stopping
@@ -358,7 +371,7 @@ class SequenceLabelingModel(object):
             for i in tqdm(range(nb_train)):
                 feed_dict = dict()
                 batch_indices = np.arange(i * self._batch_size, (i + 1) * self._batch_size) \
-                    if (i+1)*self._batch_size <= train_data_count else \
+                    if (i + 1)*self._batch_size <= train_data_count else \
                     np.arange(i * self._batch_size, train_data_count)
                 # feature feed and dropout feed
                 for feature_name in self._feature_names:  # features
@@ -397,12 +410,16 @@ class SequenceLabelingModel(object):
             # 根据dev上的表现保存模型
             if not self._path_model:
                 continue
+
+
+
             if dev_loss < min_dev_loss:
                 min_dev_loss = dev_loss
                 current_patience = 0
                 # save model
                 self.saver.save(self.sess, self._path_model)
                 print('model has saved to %s!' % self._path_model)
+
             else:
                 current_patience += 1
                 print('no improvement, current patience: %d / %d' %
@@ -411,6 +428,7 @@ class SequenceLabelingModel(object):
                     print('\nfinished training! (early stopping, max patience: %d)'
                           % self._train_max_patience)
                     return
+
         print('\nfinished training!')
         return
 
@@ -423,11 +441,28 @@ class SequenceLabelingModel(object):
         Returns:
             data_train_dict, data_dev_dict: same type as data_dict
         """
+        with open('./config.yml') as file_config:
+            config = yaml.load(file_config)
+        max_len = config['model_params']['sequence_length']
+        sentence_count = data_dict[data_dict.keys()[0]].shape[0]
         data_train_dict, data_dev_dict = dict(), dict()
+        random.random()
         for name in data_dict.keys():
-            boundary = int((1.-dev_size) * data_dict[name].shape[0])
-            data_train_dict[name] = data_dict[name][:boundary]
-            data_dev_dict[name] = data_dict[name][boundary:]
+            data_train_dict[name] = np.zeros((sentence_count, max_len), dtype='int32')
+            data_dev_dict[name] = np.zeros((sentence_count, max_len), dtype='int32')
+        for i in range(len(data_dict[data_dict.keys()[0]])):
+            if random.random() >= dev_size:
+                for name in data_dict.keys():
+                    data_train_dict[name][i] = data_dict[name][i]
+            else:
+                for name in data_dict.keys():
+                    data_dev_dict[name][i] = data_dict[name][i]
+        # data_train_dict = dict()
+        # data_dev_dict = dict()
+        # for name in data_dict.keys():
+        #     boundary = int((1.-dev_size) * data_dict[name].shape[0])
+        #     data_train_dict[name] = data_dict[name][:boundary]
+        #     data_dev_dict[name] = data_dict[name][boundary:]
         return data_train_dict, data_dev_dict
 
     def evaluate(self, data_dict):

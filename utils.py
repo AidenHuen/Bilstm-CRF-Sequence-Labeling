@@ -80,6 +80,7 @@ def create_dictionary(token_dict, dic_path, start=0, sort=False,
     if sort:
         # sort
         token_list = sorted(token_dict.items(), key=lambda d: d[1], reverse=True)
+
         for i, item in enumerate(token_list):
             if min_count and item[1] < min_count:
                 continue
@@ -206,4 +207,6 @@ def load_embed_from_txt(path):
         vec = np.array(items[1:], dtype='float32')
         embedding[item] = vec
         line = file_r.readline()
+    # for term in embedding.keys():
+    #     print term,embedding[term]
     return embedding, vec_dim

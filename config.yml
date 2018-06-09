@@ -1,20 +1,28 @@
 data_params:
-  path_answer: ./data/nlpcc_dataset/testset_answer.txt
-  path_result: ./data/nlpcc_dataset/test_result.result
-  path_test: ./data/nlpcc_dataset/testset.txt
-  path_train: ./data/nlpcc_dataset/trainset.txt
+  path_answer: ./data/film/testset_answer.txt
+  path_result: ./data/film/test_result.result
+  path_test: ./data/film/testset.txt
+  path_train: ./data/film/trainset_df.txt
   sep: table
   voc_params:
     char: {min_count: 0, path: ./Res/voc/char.voc.pkl}
     f1: {min_count: 0, path: ./Res/voc/f1.voc.pkl}
+    f10: {min_count: 0, path: ./Res/voc/f10.voc.pkl}
     f2: {min_count: 0, path: ./Res/voc/f2.voc.pkl}
+    f3: {min_count: 0, path: ./Res/voc/f3.voc.pkl}
+    f4: {min_count: 0, path: ./Res/voc/f4.voc.pkl}
+    f5: {min_count: 0, path: ./Res/voc/f5.voc.pkl}
+    f6: {min_count: 0, path: ./Res/voc/f6.voc.pkl}
+    f7: {min_count: 0, path: ./Res/voc/f7.voc.pkl}
+    f8: {min_count: 0, path: ./Res/voc/f8.voc.pkl}
+    f9: {min_count: 0, path: ./Res/voc/f9.voc.pkl}
     label: {min_count: 0, path: ./Res/voc/label.voc.pkl}
 model: NER
 model_params:
   batch_size: 64
-  bilstm_params: {num_layers: 4, num_units: 256, rnn_dropout: 0.2}
+  bilstm_params: {num_layers: 2, num_units: 256, rnn_dropout: 0.2}
   clip: 10
-  conv_dropout: 0.2
+  conv_dropout: 0.3
   conv_filter_len_list: [1, 2, 3, 4, 5]
   conv_filter_size_list: [8, 8, 8, 8, 8]
   dev_size: 0.2
@@ -28,24 +36,64 @@ model_params:
     f1:
       dropout_rate: 0.3
       path: ./Res/embed/char_embed.pkl
-      path_pre_train: ./data/embedding/nlpcc_embed_d200_w9_all
-      shape: [3839, 200]
+      path_pre_train: ./data/embedding/film_embed_d200_w9_all
+      shape: [2644, 200]
+    f10:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [8, 32]
     f2:
       dropout_rate: 0.3
       path: null
       path_pre_train: null
-      shape: [5, 32]
-  feature_names: [f1]
-  l2_rate: 0.001
-  learning_rate: 0.002
+      shape: [8, 32]
+    f3:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [8, 32]
+    f4:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [8, 32]
+    f5:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [4, 32]
+    f6:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [8, 32]
+    f7:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [8, 32]
+    f8:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [8, 32]
+    f9:
+      dropout_rate: 0.3
+      path: null
+      path_pre_train: null
+      shape: [8, 32]
+  feature_names: [f1, f2, f3, f4, f5, f6, f7, f8, f9, f10]
+  l2_rate: 0.002
+  learning_rate: 0.001
   max_patience: 5
-  nb_classes: 123
-  nb_epoch: 200
-  path_model: ./Model/nlpcc-d200-w9-l4-bilstm-crf/best_model
+  nb_classes: 17
+  nb_epoch: 100
+  path_model: ./Model/bilstm-crf-10f-embed/best_model
   rnn_unit: lstm
-  sequence_len_pt: 98
-  sequence_length: 84
+  sequence_len_pt: 100
+  sequence_length: 133
   use_char_feature: false
   use_crf: true
   word_len_pt: 95
-  word_length: 1
+  word_length: 11

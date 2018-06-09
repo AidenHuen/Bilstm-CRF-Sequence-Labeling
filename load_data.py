@@ -82,9 +82,14 @@ def init_data(path, feature_names, vocs, max_len, model='train',
         [one_instance_items.append([]) for _ in range(len(feature_names)+1)]
 
         for item in items:
+            if item ==u"":
+                continue
             feature_tokens = item.split(sep)  # 根据数据集中间隔符，将特征和标签分开
+
             for j in range(feature_count):
+
                 one_instance_items[j].append(feature_tokens[j])
+
             if model == 'train':
                 one_instance_items[-1].append(feature_tokens[-1])
         for i in range(len(feature_names)):

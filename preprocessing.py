@@ -35,9 +35,8 @@ def build_vocabulary(path_data, path_vocs_dict, min_counts_dict, columns,
 
     sequence_length_list = []  # 句子长度
     # 计数items
-    feature_item_dict_list = []
-    for i in range(len(columns)):
-        feature_item_dict_list.append(defaultdict(int))
+    feature_item_dict_list = [defaultdict(int) for i in range(len(columns))]
+
     # char feature
     if use_char_featrue:
         char_dict = defaultdict(int)
@@ -56,7 +55,6 @@ def build_vocabulary(path_data, path_vocs_dict, min_counts_dict, columns,
             continue
         items = line.split('\t')
         sequence_length += 1
-        # print(items)
         for i in range(len(columns)-1):
             feature_item_dict_list[i][items[i]] += 1
         # label
@@ -84,6 +82,7 @@ def build_vocabulary(path_data, path_vocs_dict, min_counts_dict, columns,
         voc_sizes.append(size)
     for i, name in enumerate(columns):
         start = 1 if i == len(columns) - 1 else 2
+        # print feature_item_dict_list[i], path_vocs_dict[name], min_counts_dict[name]
         size = create_dictionary(
             feature_item_dict_list[i], path_vocs_dict[name], start=start,
             sort=True, min_count=min_counts_dict[name], overwrite=True)
@@ -132,8 +131,10 @@ def main():
 
     # 构建字典(同时获取词表size，序列最大长度)
     columns = config['model_params']['feature_names'] + ['label']
+    # print "colums:",columns
     min_counts_dict, path_vocs_dict = defaultdict(int), dict()
     feature_names = config['model_params']['feature_names']
+
     for feature_name in feature_names:
         min_counts_dict[feature_name] = \
             config['data_params']['voc_params'][feature_name]['min_count']
@@ -154,6 +155,7 @@ def main():
         min_counts_dict=min_counts_dict, path_vocs_dict=path_vocs_dict,
         sequence_len_pt=sequence_len_pt, use_char_featrue=use_char_feature,
         word_len_pt=word_len_pt)
+    print voc_sizes, lengths
     if not use_char_feature:
         sequence_length = lengths[0]
     else:
@@ -178,6 +180,7 @@ def main():
         feature_dim_dict[feature_name] = vec_dim
         embedding_matrix = np.zeros((len(voc.keys())+2, vec_dim), dtype='float32')
         for item in voc:
+            print item,voc[item]
             if item in embedding_dict:
                 embedding_matrix[voc[item], :] = embedding_dict[item]
             else:
